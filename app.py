@@ -4,7 +4,7 @@ import random
 
 app = Flask(__name__)
 
-@app.route('/auth_code', methods=['GET'])
+@app.route('/auth_code', methods=['POST'])
 def auth_code():
     code = random.randint(1000, 9999)
     return jsonify({
