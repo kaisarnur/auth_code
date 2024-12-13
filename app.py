@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
+from asgiref.wsgi import WsgiToAsgi
 import random
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ def auth_code():
         "text": f"Ваш код: {code}"
     })
 
+asgi_app = WsgiToAsgi(app)
 
 if __name__ == '__main__':
     app.run(debug=True)
