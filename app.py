@@ -36,7 +36,7 @@ def auth_code():
     code = random.randint(1000, 9999)
 
     return jsonify({
-        "response_type": "ephemeral",
+        "response_type": "in_channel",
         "text": f"Ваш код: {code}"
     })
 
