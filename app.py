@@ -34,7 +34,7 @@ def auth_code():
         return jsonify({"error": "Invalid request signature"}), 400
 
     code = random.randint(1000, 9999)
-    print(request.data)
+    print(request.json)
     return jsonify({
         "response_type": "in_channel",
         "text": f"Ваш код: {code}"
