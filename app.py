@@ -35,6 +35,7 @@ def auth_code():
 
     code = random.randint(1000, 9999)
     print(request.json)
+    print(request.json.get('channel_name'))
     return jsonify({
         "response_type": "in_channel",
         "text": f"Ваш код: {code}"
