@@ -33,14 +33,58 @@ def auth_code():
     if not verify_slack_signature(request, SLACK_SIGNING_SECRET):
         return jsonify({"error": "Invalid request signature"}), 400
 
-    code = random.randint(1000, 9999)
-    print(request.json)
-    print(request.json.get('channel_name'))
-    return jsonify({
-        "response_type": "in_channel",
-        "text": f"Ваш код: {code}"
-    })
+    # code = random.randint(1000, 9999)
+    # print(request.form)
+    # print(request.form.get('token'))
+    # return jsonify({
+    #     "response_type": "in_channel",
+    #     "text": f"Ваш код: {code}"
+    # })
+    data = request.form
+    user_id = data.get('user_id')
+    command_text = data.get('text')  # Содержит ссылку из команды
+    response_url = data.get('response_url')  # URL для ответа
 
+    message = {
+        "response_type": "in_channel",
+        "text": f"<@{user_id}> начал deploy: {command_text}",
+        "attachments": [
+            {
+                "text": "Когда закончите, нажмите на кнопку:",
+                "callback_id": "deploy_action",
+                "actions": [
+                    {
+                        "name": "done",
+                        "text": "Закончил",
+                        "type": "button",
+                        "value": "done"
+                    }
+                ]
+            }
+        ]
+    }
+
+    return jsonify(message)
+
+@app.route('/slack/actions', methods=['POST'])
+def handle_actions():
+    payload = request.form.get('payload')
+    if not payload:
+        return jsonify({"error": "No payload received"}), 400
+
+    action_data = json.loads(payload)
+    user_id = action_data['user']['id']
+    callback_id = action_data['callback_id']
+
+    if callback_id == "deploy_action":
+        action = action_data['actions'][0]
+        if action['value'] == 'done':
+            return jsonify({
+                "response_type": "in_channel",
+                "text": f"<@{user_id}> закончил deploy!"
+            })
+
+    return jsonify({"error": "Unknown action"}), 400
 
 asgi_app = WsgiToAsgi(app)
 
